@@ -1,0 +1,12 @@
+# zcode profile — drives desktop ZCode IDE via ai-driver CDP bridge (port 9224)
+name: zcode
+binary: ai-driver
+new:    ["run", "--driver", "zcode", "-m", "{model}", "--json", "-w", ".", "{prompt}"]
+resume: ["run", "--driver", "zcode", "-m", "{model}", "--session", "{session_id}", "--json", "-w", ".", "{prompt}"]
+auto:   []
+prompt_via: argv
+parser: claude_stream_json
+quota_patterns: ["quota", "insufficient", "credits exhausted", "no longer available", "limit reach", "limit reached"]
+auth_patterns:  ["login", "unauthorized", "auth"]
+unavailable_patterns: ["connection refused", "not running", "cannot connect", "no output", "remote debugging", "cdp"]
+share_cooldown: true

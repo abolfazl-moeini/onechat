@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "opencode",
+    "models"
+  ],
+  "exit_code": 0,
+  "duration_s": 0.053,
+  "stderr_tail": [],
+  "env": {}
+}

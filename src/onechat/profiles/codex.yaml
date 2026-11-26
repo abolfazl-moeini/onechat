@@ -1,0 +1,14 @@
+# codex profile — `codex exec --json` verified via captured event stream; resume syntax from
+# plan, not verified tonight (docs/compat.md §1 marks it unverified).
+# Plan 09 K2: PIN the codex binary per deployment — the exec --json event enum drifts
+# between releases (--full-auto was REMOVED; collab_tool_call was ADDED).
+# After upgrades: re-run scripts/capture_cli.py + tests/router/test_parsers.py.
+name: codex
+binary: codex
+new:    ["exec", "--json", "-m", "{model}", "{auto}", "{prompt}"]
+resume: ["exec", "{auto}", "resume", "--json", "-m", "{model}", "{session_id}", "{prompt}"]
+auto:   ["--sandbox", "workspace-write", "--skip-git-repo-check"]
+prompt_via: argv
+parser: codex_jsonl
+quota_patterns: ["usage limit", "rate limit", "http 429", "insufficient_quota"]
+auth_patterns:  ["not logged in", "401 unauthorized", "unauthorized"]

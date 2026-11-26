@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "claude",
+    "-p",
+    "Reply with the word PONG",
+    "--output-format",
+    "stream-json",
+    "--verbose"
+  ],
+  "exit_code": 1,
+  "duration_s": 1.304,
+  "stderr_tail": [],
+  "env": {}
+}

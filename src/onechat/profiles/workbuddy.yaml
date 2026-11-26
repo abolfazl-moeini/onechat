@@ -1,0 +1,13 @@
+# workbuddy profile — drives desktop WorkBuddy AI via Electron CDP bridge with fullAccess/bypassPermissions
+name: workbuddy
+binary: workbuddy
+new:    ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--resume", "{session_id}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+auto:   ["--permission-mode", "bypassPermissions", "-y"]
+prompt_via: argv
+parser: claude_stream_json
+quota_patterns: ["usage limit", "rate limit", "http 429", "insufficient_quota", "insufficient credit", "limit reach", "limit reached"]
+auth_patterns:  ["authentication_failed", "Failed to authenticate", "not logged in", "401 unauthorized", "Authentication required"]
+unavailable_patterns: ["connection refused", "not running", "cannot connect", "no output", "remote debugging", "cdp"]
+share_cooldown: true
+

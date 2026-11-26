@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "agy",
+    "-p",
+    "Reply with the word PONG",
+    "--output-format",
+    "stream-json"
+  ],
+  "exit_code": 1,
+  "duration_s": 4.968,
+  "stderr_tail": [
+    "error: Eligibility check failed: request failed (code 403): HTML response \"Error 403 (Forbidden)!!1\". Please log out (/logout) and log back in (/login)."
+  ],
+  "env": {}
+}

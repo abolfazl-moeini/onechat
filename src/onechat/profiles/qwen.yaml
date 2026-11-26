@@ -1,0 +1,11 @@
+# qwen profile — qwen is Claude-Code-like (result/error_during_execution schema captured);
+# flags verified-local from `qwen --help` (--resume/--continue/--session-id/--approval-mode/--yolo).
+name: qwen
+binary: qwen
+new:    ["-p", "{prompt}", "-o", "stream-json", "-m", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--resume", "{session_id}", "-o", "stream-json", "-m", "{model}", "{auto}"]
+auto:   ["--approval-mode", "yolo"]
+prompt_via: argv
+parser: qwen_stream_json
+quota_patterns: ["quota", "http 429", "rate limit"]
+auth_patterns:  ["No auth type", "not logged in", "401 unauthorized", "unauthorized"]

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "codex",
+    "exec",
+    "--json",
+    "Reply with the word PONG"
+  ],
+  "exit_code": 1,
+  "duration_s": 10.09,
+  "stderr_tail": [
+    "Reading additional input from stdin..."
+  ],
+  "env": {}
+}

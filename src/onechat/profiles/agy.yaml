@@ -1,0 +1,11 @@
+# agy profile — new-turn stream shape verified via captured result event; --mode auto not in
+# help (docs/compat.md §1) so auto list is minimal: --sandbox only.
+name: agy
+binary: agy
+new:    ["-p", "{prompt}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--conversation", "{session_id}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
+auto:   ["--dangerously-skip-permissions", "--mode", "accept-edits"]
+prompt_via: argv
+parser: agy_stream_json
+quota_patterns: ["usage limit", "http 429", "rate limit", "quota"]
+auth_patterns:  ["Eligibility check failed", "/login", "401 unauthorized", "unauthorized"]

@@ -1,0 +1,11 @@
+# claude profile — flags verified-local from `claude --help` (docs/compat.md §1, 2026-11-02).
+# resume flag exists in help; end-to-end resume behavior unverified (OAuth expired at capture).
+name: claude
+binary: claude
+new:    ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--resume", "{session_id}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+auto:   ["--permission-mode", "bypassPermissions"]
+prompt_via: argv
+parser: claude_stream_json
+quota_patterns: ["usage limit", "rate limit", "http 429", "insufficient_quota"]
+auth_patterns:  ["authentication_failed", "Failed to authenticate", "not logged in", "401 unauthorized"]

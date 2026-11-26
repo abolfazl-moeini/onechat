@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "opencode",
+    "run",
+    "Reply with the word PONG",
+    "--format",
+    "json"
+  ],
+  "exit_code": 1,
+  "duration_s": 1.733,
+  "stderr_tail": [],
+  "env": {}
+}

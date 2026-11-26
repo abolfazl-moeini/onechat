@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "opencode",
+    "run",
+    "Reply with the word PONG",
+    "--format",
+    "json",
+    "-m",
+    "openrouter/google/gemma-4-31b-it:free"
+  ],
+  "exit_code": 1,
+  "duration_s": 0.624,
+  "stderr_tail": [],
+  "env": {}
+}

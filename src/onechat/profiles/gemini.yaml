@@ -1,0 +1,11 @@
+# gemini profile — flags verified-local from `gemini --help` (--resume/--session-id/--session-file,
+# --approval-mode/--yolo). Turn-level behavior unverified (interactive login at capture).
+name: gemini
+binary: gemini
+new:    ["-p", "{prompt}", "-o", "stream-json", "-m", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--resume", "{session_id}", "-o", "stream-json", "-m", "{model}", "{auto}"]
+auto:   ["--approval-mode", "yolo"]
+prompt_via: argv
+parser: gemini_stream_json
+quota_patterns: ["quota", "http 429", "rate limit", "RESOURCE_EXHAUSTED"]
+auth_patterns:  ["not authenticated", "login required", "not logged in", "401 unauthorized"]

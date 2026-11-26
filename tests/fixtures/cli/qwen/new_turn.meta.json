@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "qwen",
+    "-p",
+    "Reply with the word PONG",
+    "-o",
+    "stream-json"
+  ],
+  "exit_code": 1,
+  "duration_s": 1.838,
+  "stderr_tail": [],
+  "env": {}
+}

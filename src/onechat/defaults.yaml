@@ -1,0 +1,47 @@
+# Package defaults for onechat. User config (~/.onechat/config.yaml) overrides by executor id.
+db_path: ~/.onechat/onechat.db
+executors: []
+handoff:
+  recent_turns: 6
+  turn_max_chars: 4000
+  brief_max_chars: 24000
+  compact_threshold_chars: 30000
+cooldown:
+  min_requests: 1
+  failure_rate: 0.5
+  window_s: 60
+  quota_cooldown_s: 7200
+  timeout_cooldown_s: 7200
+  error_cooldown_s: 14400
+  auth_cooldown_s: 86400
+  share_profile_cooldown: true
+tier_policy:
+  min_tier: 2
+  max_tier: 2
+  by_task_kind:
+    summarize: 2
+    research: 2
+    digest: 2
+    fix: 2
+    test: 2
+    code: 2
+    plan: 2
+    spec: 2
+    review: 2
+  chat_default: 2
+  high_keywords: [deepswe, automationbench]
+  escalate_every: 0
+  cost_order: [free, subscription, paid]
+  allow_paid: false
+roles:
+  builder: codex
+  reviewer: claude
+  auditor: codex
+benchmark:
+  enabled: false
+  interval_s: 1800
+  max_latency_s: 15.0
+  timeout_s: 20.0
+  promote_roles: [builder, code]
+  selection_mode: order
+  targets: []

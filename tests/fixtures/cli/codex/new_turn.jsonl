@@ -1,0 +1,11 @@
+{"type": "thread.started", "thread_id": "01a19de0-7ffd-7201-b8c8-4896fa221e75"}
+{"type": "item.completed", "item": {"id": "item_0", "type": "error", "message": "`[features].codex_hooks` is deprecated. Use `[features].hooks` instead. (Enable it with `--enable hooks` or `[features].hooks` in config.toml. See https://developers.openai.com/codex/config-basic#feature-flags for details.)"}}
+{"type": "turn.started"}
+{"type": "item.completed", "item": {"id": "item_1", "type": "error", "message": "Skill descriptions were shortened to fit the skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest."}}
+{"type": "error", "message": "Reconnecting... 1/5 (unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c543fa9abd24-FRA)"}
+{"type": "error", "message": "Reconnecting... 2/5 (unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c5488dbfbd24-FRA)"}
+{"type": "error", "message": "Reconnecting... 3/5 (unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c54ce8d5bd24-FRA)"}
+{"type": "error", "message": "Reconnecting... 4/5 (unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c5538848bd24-FRA)"}
+{"type": "error", "message": "Reconnecting... 5/5 (unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c5603e1dbd24-FRA)"}
+{"type": "error", "message": "unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c575dab6bd24-FRA"}
+{"type": "turn.failed", "error": {"message": "unexpected status 403 Forbidden: Country, region, or territory not supported, url: http://127.0.0.1:8787/w/codex/v1/responses, cf-ray: a545c575dab6bd24-FRA"}}

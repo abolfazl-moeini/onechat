@@ -1,0 +1,11 @@
+# opencode profile — `opencode run --format json` event stream captured live (step_start/error);
+# --session/--continue/--model verified-local from help. Free models: openrouter/<id>:free.
+name: opencode
+binary: opencode
+new:    ["run", "{prompt}", "--format", "json", "-m", "{model}", "{auto}"]
+resume: ["run", "{prompt}", "--session", "{session_id}", "--format", "json", "-m", "{model}", "{auto}"]
+auto:   ["--auto"]
+prompt_via: argv
+parser: opencode_json
+quota_patterns: ["http 429", "rate limit", "quota", "insufficient credit", "limit reach", "limit reached"]
+auth_patterns:  ["provider.auth", "401 unauthorized", "unauthorized", "Access denied"]
