@@ -1,6 +1,6 @@
 [project]
 name = "onechat-cli"
-version = "0.2.0"
+version = "0.2.1"
 description = "One chat session surviving AI backend switches (CLI agents + OpenAI-compatible APIs)"
 readme = "README.md"
 license = "MIT"

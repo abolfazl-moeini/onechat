@@ -87,9 +87,6 @@ def run(
             session_id=session,
             continue_latest=not new_session and session is None,
         )
-        if not quiet and not json_output:
-            sys.stderr.write(f"[onechat] session: {sess.id} (workdir: {target})\n")
-            sys.stderr.flush()
         reply = sess.ask_sync(
             prompt,
             tier=tier,
@@ -101,6 +98,12 @@ def run(
             timeout_s=timeout,
             on_event=on_event,
         )
+        if not quiet and not json_output:
+            sys.stderr.write(
+                f"[onechat] session: {reply.session_id} "
+                f"(mode={reply.continuity_mode}, executor={reply.executor_id}, workdir={target})\n"
+            )
+            sys.stderr.flush()
     finally:
         stop_heartbeat()
     typer.echo(json.dumps(reply.model_dump(), ensure_ascii=False) if json_output else reply.text)

@@ -92,7 +92,7 @@ def build_request(
     native: dict[str, Any] | None,
 ) -> TurnRequest:
     """Route the turn: native resume (+delta) / full handoff / fresh prompt."""
-    wd = Path(session["workdir"])
+    wd = Path(session["workdir"]).expanduser().resolve()
     t_s, i_s = need.timeout_s or config.turn_timeout_s, config.inactivity_timeout_s
     boot = _should_bootstrap(need, prompt)
     if spec.kind == "api":
@@ -246,29 +246,30 @@ def apply_executor_overrides(
 
 def advance_native(
     store: Any, session_id: str, spec: Any, result: Any, assistant_idx: int, resumed: bool
-) -> None:
+) -> list[str]:
+    """Update native session mapping and return any continuity drift warnings."""
+    warnings: list[str] = []
     if result.native_session_id:
         if resumed:
             prev = store.get_native(session_id, spec.id)
             if prev and prev.get("native_id") and prev["native_id"] != result.native_session_id:
-                logger.warning(
-                    "Native session rotated on resume for %s: %s -> %s",
-                    spec.id,
-                    prev["native_id"],
-                    result.native_session_id,
+                msg = (
+                    f"warning: {spec.id} rotated native session on resume: "
+                    f"{prev['native_id']} -> {result.native_session_id}"
                 )
+                logger.warning(msg)
+                warnings.append(msg)
         store.set_native(session_id, spec.id, result.native_session_id, assistant_idx)
-        return
+        return warnings
     if resumed:
         native = store.get_native(session_id, spec.id)
         if native is not None and native["native_id"]:
             store.set_native(session_id, spec.id, str(native["native_id"]), assistant_idx)
     elif spec.kind == "cli":
-        logger.warning(
-            "Executor %s returned no native_session_id on fresh turn in session %s",
-            spec.id,
-            session_id,
-        )
+        msg = f"warning: {spec.id} returned no native_session_id on fresh turn in {session_id}"
+        logger.warning(msg)
+        warnings.append(msg)
+    return warnings
 
 
 def select_candidates(

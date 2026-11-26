@@ -204,3 +204,98 @@ def test_stale_native_session_recovered_fresh(tmp_path: Path) -> None:
     assert reply.stop == Stop.DONE
     assert reply.text == "recovered fresh"
     assert reply.native_session_id == "new-thread-2"
+
+
+def test_anti_drift_status_event_on_missing_and_rotated_native_id(tmp_path: Path) -> None:
+    store = Store(tmp_path / "router.db")
+    store.create_session("s-drift", title="drift", workdir=str(tmp_path))
+    clock = FakeClock()
+
+    executor = FakeExecutor(
+        _spec("exec-drift", "fam-drift"),
+        [
+            # Turn 1: fresh turn returns NO native_session_id -> should warn
+            TurnResult(stop=Stop.DONE, text="turn 1", native_session_id=None),
+            # Turn 2: after manual native_id set, returns rotated native_id -> should warn
+            TurnResult(stop=Stop.DONE, text="turn 2", native_session_id="rotated-id-2"),
+        ],
+    )
+    profiles = {
+        "exec-drift": CliProfile(
+            name="exec-drift",
+            binary="true",
+            new=["{prompt}"],
+            resume=["{prompt}"],
+            parser="codex_jsonl",
+        )
+    }
+    config = RouterConfig(
+        db_path=tmp_path / "router.db",
+        executors=[executor.spec],
+        profiles=profiles,
+        tier_policy=TierPolicy(allow_paid=False),
+        handoff=HandoffConfig(),
+    )
+    router = Router(
+        config=config,
+        store=store,
+        executors={"exec-drift": executor},
+        quota=QuotaBook(store),
+        clock=clock,
+    )
+
+    events_t1: list[str] = []
+    asyncio.run(router.turn("s-drift", "Q1", Need(), on_event=lambda ev: events_t1.append(ev.text)))
+    assert any("no native_session_id" in e for e in events_t1)
+
+    store.set_native("s-drift", "exec-drift", "orig-id-1", 1)
+    events_t2: list[str] = []
+    asyncio.run(router.turn("s-drift", "Q2", Need(), on_event=lambda ev: events_t2.append(ev.text)))
+    assert any("rotated native session" in e for e in events_t2)
+    store.close()
+
+
+def test_cli_run_auto_resumes_and_isolates_workdirs(tmp_path: Path, monkeypatch: object) -> None:
+    import json
+
+    from router_fakes import fake_executors_factory
+    from typer.testing import CliRunner
+
+    import onechat.cli as cli_module
+    from onechat.sdk import AsfClient
+
+    client = AsfClient._for_tests(tmp_path, fake_executors_factory(tmp_path))
+    monkeypatch.setattr(cli_module, "AsfClient", lambda **kw: client)  # type: ignore[attr-defined]
+    runner = CliRunner()
+
+    dir_a = tmp_path / "proj_a"
+    dir_b = tmp_path / "proj_b"
+    dir_a.mkdir()
+    dir_b.mkdir()
+
+    r1 = runner.invoke(cli_module.app, ["run", "hi a1", "--workdir", str(dir_a), "--json"])
+    assert r1.exit_code == 0, r1.output
+    p1 = json.loads(r1.stdout)
+    assert p1["continuity_mode"] == "fresh"
+
+    # Second run in dir_a without --session MUST auto-continue the same session_id
+    r2 = runner.invoke(cli_module.app, ["run", "hi a2", "--workdir", str(dir_a), "--json"])
+    assert r2.exit_code == 0, r2.output
+    p2 = json.loads(r2.stdout)
+    assert p2["session_id"] == p1["session_id"]
+
+    # Run in dir_b MUST create a separate session for dir_b
+    r3 = runner.invoke(cli_module.app, ["run", "hi b1", "--workdir", str(dir_b), "--json"])
+    assert r3.exit_code == 0, r3.output
+    p3 = json.loads(r3.stdout)
+    assert p3["session_id"] != p1["session_id"]
+
+    # Run in dir_a with --new-session MUST start a fresh session
+    r4 = runner.invoke(
+        cli_module.app,
+        ["run", "hi a fresh", "--workdir", str(dir_a), "--new-session", "--json"],
+    )
+    assert r4.exit_code == 0, r4.output
+    p4 = json.loads(r4.stdout)
+    assert p4["session_id"] != p1["session_id"]
+    client.close()

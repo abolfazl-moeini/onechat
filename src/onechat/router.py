@@ -271,7 +271,9 @@ class Router:
             stop=result.stop.value,
             subagent_role=need.role if need else None,
         )
-        advance_native(self.store, session_id, spec, result, assistant_idx, resumed)
+        warnings = advance_native(self.store, session_id, spec, result, assistant_idx, resumed)
+        for warn in warnings:
+            self._emit(on_event, Event(kind="status", text=warn))
         session = self.store.get_session(session_id) or {}
         turns = self.store.turns(session_id, since_idx=0)  # full history (T12a off-by-one)
         await self._safe_compact(session, turns)

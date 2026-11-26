@@ -134,3 +134,62 @@ def test_nonexistent_workdir_fails_fast(tmp_path: Path) -> None:
     assert result.stop == Stop.ERROR
     assert "Workdir does not exist" in (result.error or "")
     assert len(runner.calls) == 0  # Subprocess was never invoked!
+
+
+def test_workdir_with_spaces_and_symlink_resolved(tmp_path: Path) -> None:
+    import yaml
+
+    real_dir = tmp_path / "my project with spaces"
+    real_dir.mkdir()
+    link_dir = tmp_path / "link_proj"
+    link_dir.symlink_to(real_dir)
+
+    profiles_dir = Path(__file__).parent.parent / "src" / "onechat" / "profiles"
+    data = yaml.safe_load((profiles_dir / "qoder.yaml").read_text(encoding="utf-8"))
+    profile = CliProfile(**data)
+    spec = _spec_for(profile)
+
+    req = TurnRequest(prompt="test", workdir=link_dir, native_session_id="q-1")
+    argv, _ = build_argv(profile, spec, req)
+    w_idx = argv.index("-w")
+    assert argv[w_idx + 1] == str(real_dir.resolve())
+
+
+@pytest.mark.parametrize("driver_name", ["qoder", "autoclaw", "zcode"])
+def test_3_turn_desktop_simulation_argv_and_session(tmp_path: Path, driver_name: str) -> None:
+    import json
+
+    import yaml
+
+    profiles_dir = Path(__file__).parent.parent / "src" / "onechat" / "profiles"
+    data = yaml.safe_load((profiles_dir / f"{driver_name}.yaml").read_text(encoding="utf-8"))
+    profile = CliProfile(**data)
+    spec = _spec_for(profile)
+
+    turn1_out = json.dumps(
+        {"type": "result", "session_id": f"{driver_name}-sess-42", "result": "Turn 1 ok"}
+    )
+    turn2_out = json.dumps(
+        {"type": "result", "session_id": f"{driver_name}-sess-42", "result": "Turn 2 ok"}
+    )
+    runner = FakeProcessRunner(lines=[turn1_out], exit_code=0)
+    exe = CliExecutor(spec, profile, runner=runner, which=lambda _: True)
+
+    res1 = asyncio.run(exe.run(TurnRequest(prompt="p1", workdir=tmp_path)))
+    assert res1.stop == Stop.DONE
+    assert res1.native_session_id == f"{driver_name}-sess-42"
+    assert "--session" not in runner.calls[0]["argv"]
+    assert str(tmp_path.resolve()) in runner.calls[0]["argv"]
+
+    runner2 = FakeProcessRunner(lines=[turn2_out], exit_code=0)
+    exe2 = CliExecutor(spec, profile, runner=runner2, which=lambda _: True)
+    res2 = asyncio.run(
+        exe2.run(
+            TurnRequest(prompt="p2", workdir=tmp_path, native_session_id=res1.native_session_id)
+        )
+    )
+    assert res2.stop == Stop.DONE
+    assert res2.native_session_id == f"{driver_name}-sess-42"
+    assert "--session" in runner2.calls[0]["argv"]
+    assert f"{driver_name}-sess-42" in runner2.calls[0]["argv"]
+    assert str(tmp_path.resolve()) in runner2.calls[0]["argv"]

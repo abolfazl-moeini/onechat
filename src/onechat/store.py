@@ -102,12 +102,23 @@ class Store:
     def latest_session_for_workdir(self, workdir: str | Path) -> dict[str, Any] | None:
         """Find the most recent session created for a normalized workdir."""
         target_path = str(Path(workdir).expanduser().resolve())
-        # First try exact match on normalized path
+        direct = self._query_row(
+            "SELECT * FROM sessions WHERE workdir=? ORDER BY created_at DESC LIMIT 1",
+            (target_path,),
+        )
+        if direct is not None:
+            return direct
         rows = self._query("SELECT * FROM sessions ORDER BY created_at DESC")
         for row in rows:
             row_wd = row.get("workdir")
-            if row_wd and str(Path(row_wd).expanduser().resolve()) == target_path:
-                return row
+            if not row_wd:
+                continue
+            try:
+                if str(Path(row_wd).expanduser().resolve()) == target_path:
+                    return row
+            except Exception:
+                if str(row_wd) == target_path:
+                    return row
         return None
 
     def pin(self, sid: str, executor_id: str | None, tier: int | None) -> None:
