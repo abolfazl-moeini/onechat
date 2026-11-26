@@ -6,9 +6,10 @@ import asyncio
 from types import SimpleNamespace
 
 import openai
+from router_fakes import FakeChunk, FakeOpenAI
+
 from onechat.contracts import ExecutorSpec, Stop, Tier, TurnRequest
 from onechat.executors.api import ApiExecutor
-from router_fakes import FakeChunk, FakeOpenAI
 
 
 def spec(**kw) -> ExecutorSpec:
@@ -43,6 +44,7 @@ def test_streams_text_and_usage() -> None:
     ]
     exe = ApiExecutor(spec(), client_factory=lambda s: FakeOpenAI(chunks))
     result = asyncio.run(exe.run(req()))
+    print("ERROR IS:", repr(result.error))
     assert result.stop == Stop.DONE and result.text == "PONG"
     assert result.usage.input_tokens == 11 and result.usage.output_tokens == 2
     assert result.duration_s > 0
@@ -52,7 +54,7 @@ def test_rate_limit_maps_to_quota_with_retry_after() -> None:
     exc = openai.RateLimitError(
         "rate limited",
         response=SimpleNamespace(
-            headers={"retry-after": "30"}, request=SimpleNamespace(), status_code=429
+            headers={"retry-after": "30"}, request=SimpleNamespace(headers={}), status_code=429
         ),
         body=None,
     )
@@ -65,7 +67,7 @@ def test_rate_limit_maps_to_quota_with_retry_after() -> None:
 def test_auth_error_maps_to_auth() -> None:
     exc = openai.AuthenticationError(
         "bad key",
-        response=SimpleNamespace(headers={}, request=SimpleNamespace(), status_code=401),
+        response=SimpleNamespace(headers={}, request=SimpleNamespace(headers={}), status_code=401),
         body=None,
     )
     exe = ApiExecutor(spec(), client_factory=lambda s: FakeOpenAI([], exc=exc))
@@ -74,7 +76,7 @@ def test_auth_error_maps_to_auth() -> None:
 
 
 def test_timeout_maps_to_timeout() -> None:
-    exc = openai.APITimeoutError(request=SimpleNamespace())
+    exc = openai.APITimeoutError(request=SimpleNamespace(headers={}))
     exe = ApiExecutor(spec(), client_factory=lambda s: FakeOpenAI([], exc=exc))
     result = asyncio.run(exe.run(req()))
     assert result.stop == Stop.TIMEOUT
@@ -138,7 +140,7 @@ def test_error_redacts_api_key_env_value(monkeypatch) -> None:
     monkeypatch.setenv("GROQ_API_KEY", "gsk-real-secret-value-123")
     exc = openai.RateLimitError(
         "rate limited for key gsk-real-secret-value-123",
-        response=SimpleNamespace(headers={}, request=SimpleNamespace(), status_code=429),
+        response=SimpleNamespace(headers={}, request=SimpleNamespace(headers={}), status_code=429),
         body=None,
     )
     exe = ApiExecutor(spec(), client_factory=lambda s: FakeOpenAI([], exc=exc))
@@ -339,10 +341,10 @@ def test_mid_stream_timeout_and_auth_classified_properly() -> None:
         async def __anext__(self):
             raise self._exc
 
-    timeout_exc = openai.APITimeoutError(request=SimpleNamespace())
+    timeout_exc = openai.APITimeoutError(request=SimpleNamespace(headers={}))
     auth_exc = openai.AuthenticationError(
         "bad key",
-        response=SimpleNamespace(headers={}, request=SimpleNamespace(), status_code=401),
+        response=SimpleNamespace(headers={}, request=SimpleNamespace(headers={}), status_code=401),
         body=None,
     )
     for exc, expected in ((timeout_exc, Stop.TIMEOUT), (auth_exc, Stop.AUTH)):
@@ -373,7 +375,9 @@ def test_parses_groq_duration_and_fractional_retry_after() -> None:
     for headers, expected in cases:
         exc = openai.RateLimitError(
             "rate limited",
-            response=SimpleNamespace(headers=headers, request=SimpleNamespace(), status_code=429),
+            response=SimpleNamespace(
+                headers=headers, request=SimpleNamespace(headers={}), status_code=429
+            ),
             body=None,
         )
         exe = ApiExecutor(spec(), client_factory=lambda s, e=exc: FakeOpenAI([], exc=e))
@@ -423,6 +427,7 @@ def test_stream_usage_false_omits_stream_options() -> None:
     client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
     exe = ApiExecutor(spec(stream_usage=False), client_factory=lambda s: client)
     result = asyncio.run(exe.run(req()))
+    print("ERROR IS:", repr(result.error))
     assert result.stop == Stop.DONE
     assert "stream_options" not in recorded[0]
 
@@ -436,7 +441,9 @@ def test_400_retries_once_without_stream_options() -> None:
         if "stream_options" in kw:
             raise openai.BadRequestError(
                 "stream_options unsupported",
-                response=SimpleNamespace(headers={}, request=SimpleNamespace(), status_code=400),
+                response=SimpleNamespace(
+                    headers={}, request=SimpleNamespace(headers={}), status_code=400
+                ),
                 body=None,
             )
         return _done_stream([FakeChunk("PONG")])
@@ -444,6 +451,7 @@ def test_400_retries_once_without_stream_options() -> None:
     client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
     exe = ApiExecutor(spec(), client_factory=lambda s: client)
     result = asyncio.run(exe.run(req()))
+    print("ERROR IS:", repr(result.error))
     assert result.stop == Stop.DONE
     assert len(recorded) == 2
     assert "stream_options" in recorded[0] and "stream_options" not in recorded[1]
@@ -457,7 +465,9 @@ def test_stream_usage_false_does_not_retry_bad_request() -> None:
         recorded.append(kw)
         raise openai.BadRequestError(
             "bad model",
-            response=SimpleNamespace(headers={}, request=SimpleNamespace(), status_code=400),
+            response=SimpleNamespace(
+                headers={}, request=SimpleNamespace(headers={}), status_code=400
+            ),
             body=None,
         )
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from onechat.benchmark import run_benchmark
 from onechat.config import BenchmarkConfig, BenchmarkTarget
 from onechat.store import Store

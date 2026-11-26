@@ -10,13 +10,14 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+from router_fakes import FakeClock, FakeExecutor
+
 from onechat.config import CliProfile, HandoffConfig, RouterConfig, TierPolicy
 from onechat.contracts import Capability, CostClass, ExecutorSpec, Stop, Tier, TurnResult
 from onechat.quota import QuotaBook
 from onechat.router import Router
 from onechat.selector import Need
 from onechat.store import Store
-from router_fakes import FakeClock, FakeExecutor
 
 
 def _spec(eid: str, family: str, priority: int = 100) -> ExecutorSpec:

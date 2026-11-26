@@ -15,7 +15,7 @@ from .cli_repl import SLASH_COMMANDS, handle_slash, run_chat_turn
 from .contracts import Event, Tier
 from .sdk import AsfClient
 
-app = typer.Typer(help="asf-router: one chat, many backends", no_args_is_help=True)
+app = typer.Typer(help="onechat: one chat session surviving AI backend switches", no_args_is_help=True)
 executors_app = typer.Typer(help="executor pool management", no_args_is_help=True)
 sessions_app = typer.Typer(help="session inspection", no_args_is_help=True)
 app.add_typer(executors_app, name="executors")

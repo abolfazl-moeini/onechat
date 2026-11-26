@@ -7,10 +7,11 @@ import json
 from pathlib import Path
 
 import pytest
+from router_fakes import FakeProcessRunner
+
 from onechat.config import CliProfile
 from onechat.contracts import Capability, CostClass, ExecutorSpec, Stop, Tier
 from onechat.executors.cli import CliExecutor
-from router_fakes import FakeProcessRunner
 
 CODEX = CliProfile(
     name="codex",

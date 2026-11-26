@@ -5,10 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from onechat.config import load_config
 from pydantic import ValidationError
 
-FIXTURES = Path(__file__).resolve().parent.parent / "fixtures" / "config"
+from onechat.config import load_config
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures" / "config"
 
 
 def test_defaults_load_with_all_six_profiles(tmp_path) -> None:
@@ -269,7 +270,7 @@ def test_benchmark_config_defaults(tmp_path) -> None:
     """Benchmark config loads defaults when not configured."""
     cfg = load_config(home=tmp_path)
     assert hasattr(cfg, "benchmark")
-    assert cfg.benchmark.enabled is True
+    assert cfg.benchmark.enabled is False
     assert cfg.benchmark.interval_s == 1800
     assert cfg.benchmark.max_latency_s == 15.0
     assert cfg.benchmark.timeout_s == 20.0

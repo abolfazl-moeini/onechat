@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
+
 from onechat.contracts import (
     Capability,
     CostClass,
@@ -13,7 +15,6 @@ from onechat.contracts import (
     Tier,
     TurnResult,
 )
-from pydantic import ValidationError
 
 
 def cli_spec(**overrides: object) -> dict[str, object]:

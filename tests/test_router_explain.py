@@ -3,11 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import onechat.cli as cli_module
 import pytest
+from typer.testing import CliRunner
+
+import onechat.cli as cli_module
 from onechat.contracts import ExecutorSpec, Stop, TurnResult
 from onechat.sdk import AsfClient
-from typer.testing import CliRunner
 
 runner = CliRunner()
 

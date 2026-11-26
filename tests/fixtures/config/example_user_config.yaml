@@ -1,0 +1,9 @@
+# Example user config from Plan 02 §3 (test fixture). Model ids marked <from compat.md> in the
+# plan are filled from docs/compat.md reality (2026-11-02): free models via opencode catalog.
+executors:
+  - {id: codex-main, kind: cli, profile: codex, model: gpt-5-codex, tier: 3, capabilities: [chat, code], cost: subscription, family: openai}
+  - {id: codex-acc2, kind: cli, profile: codex, model: gpt-5-codex, tier: 3, capabilities: [chat, code], cost: subscription, family: openai, env: {CODEX_HOME: ~/.asf/accounts/codex-acc2}}
+  - {id: agy-main, kind: cli, profile: agy, model: gemini-3-pro, tier: 3, capabilities: [chat, code], cost: subscription, family: google}
+  - {id: gemini-cli, kind: cli, profile: gemini, model: gemini-2.5-flash, tier: 2, capabilities: [chat, code], cost: free, family: google, limits: {rpd: 1000}}
+  - {id: opencode-free, kind: cli, profile: opencode, model: openrouter/google/gemma-4-31b-it:free, tier: 1, capabilities: [chat, code], cost: free, family: meta}
+  - {id: groq-fast, kind: api, model: llama-3.1-8b-instant, base_url: https://api.groq.com/openai/v1, api_key_env: GROQ_API_KEY, tier: 1, capabilities: [chat], cost: free, family: meta, limits: {rpm: 30}}

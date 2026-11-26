@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+
 from onechat.contracts import ExecutorSpec, Stop, Tier, Usage
 from onechat.quota import QuotaBook, parse_retry_after
 from onechat.store import Store

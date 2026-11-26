@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import onechat.cli as cli_module
 import pytest
-from onechat.sdk import AsfClient
 from router_fakes import fake_executors_factory, write_user_config
 from typer.testing import CliRunner
+
+import onechat.cli as cli_module
+from onechat.sdk import AsfClient
 
 RUNNER = CliRunner()
 

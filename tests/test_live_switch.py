@@ -12,6 +12,7 @@ import asyncio
 from pathlib import Path
 
 import pytest
+
 from onechat.contracts import Stop
 from onechat.sdk import AsfClient
 

@@ -11,15 +11,16 @@ import asyncio
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
+from router_fakes import FakeChunk, FakeOpenAI, FakeProcessRunner
+
 from onechat.config import CliProfile
 from onechat.contracts import Capability, CostClass, ExecutorSpec, Stop, Tier, TurnResult
 from onechat.executors import build_executor
 from onechat.executors.api import ApiExecutor
 from onechat.executors.cli import CliExecutor
-from pydantic import ValidationError
-from router_fakes import FakeChunk, FakeOpenAI, FakeProcessRunner
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _spec_for(profile_name: str, eid: str) -> ExecutorSpec:
@@ -46,9 +47,7 @@ def test_contract_cli_executor_over_fixtures(profile_name: str) -> None:
     import yaml
 
     profile_data = yaml.safe_load(
-        (
-            REPO_ROOT / "packages/asf-router/src/onechat/profiles" / f"{profile_name}.yaml"
-        ).read_text(encoding="utf-8")
+        (REPO_ROOT / "src/onechat/profiles" / f"{profile_name}.yaml").read_text(encoding="utf-8")
     )
     profile = CliProfile(**profile_data)
     runner = FakeProcessRunner.from_fixture(profile_name, "new_turn")
@@ -126,7 +125,7 @@ def test_live_new_turn_available_executors() -> None:
 
     import yaml
 
-    profiles_dir = REPO_ROOT / "packages/asf-router/src/onechat/profiles"
+    profiles_dir = REPO_ROOT / "src/onechat/profiles"
     for profile_path in sorted(profiles_dir.glob("*.yaml")):
         profile = CliProfile(**yaml.safe_load(profile_path.read_text(encoding="utf-8")))
         spec = _spec_for(profile.name, f"{profile.name}-live")

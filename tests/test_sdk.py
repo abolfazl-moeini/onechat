@@ -5,9 +5,10 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+from router_fakes import fake_executors_factory, write_user_config  # noqa: F401
+
 from onechat.contracts import Stop, Tier
 from onechat.sdk import AsfClient
-from router_fakes import fake_executors_factory, write_user_config  # noqa: F401
 
 
 def test_session_ask_roundtrip(tmp_path: Path) -> None:
@@ -74,9 +75,10 @@ benchmark:
 
 def test_ask_forwards_allow_fallback(tmp_path, monkeypatch) -> None:
     """`executors test` needs pinned-only selection: allow_fallback must reach the Need."""
+    from router_fakes import fake_executors_factory
+
     from onechat.contracts import Stop
     from onechat.router import Reply
-    from router_fakes import fake_executors_factory
 
     client = AsfClient._for_tests(tmp_path, fake_executors_factory(tmp_path))
     captured: list[bool] = []

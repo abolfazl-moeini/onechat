@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from onechat.executors.parsers import PARSERS, parse
 
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "cli"
@@ -45,7 +46,7 @@ def _parser_for(profile: str) -> str:
     import yaml
 
     profile_path = (
-        Path(__file__).resolve().parent.parent.parent
+        Path(__file__).resolve().parent.parent
         / "packages"
         / "asf-router"
         / "src"
