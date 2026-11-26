@@ -119,11 +119,21 @@ class OneChatClient:
         )
 
     def session(
-        self, workdir: Path | str = ".", session_id: str | None = None, title: str | None = None
+        self,
+        workdir: Path | str = ".",
+        session_id: str | None = None,
+        title: str | None = None,
+        continue_latest: bool = False,
     ) -> Session:
-        sid = session_id or f"s-{time.time_ns():x}-{secrets.token_hex(4)}"
+        resolved_wd = str(Path(workdir).expanduser().resolve())
+        sid = session_id
+        if not sid and continue_latest:
+            latest = self.store.latest_session_for_workdir(resolved_wd)
+            if latest and latest.get("id"):
+                sid = str(latest["id"])
+        sid = sid or f"s-{time.time_ns():x}-{secrets.token_hex(4)}"
         if self.store.get_session(sid) is None:
-            self.store.create_session(sid, title=title or sid, workdir=str(workdir))
+            self.store.create_session(sid, title=title or sid, workdir=resolved_wd)
         return Session(self, sid)
 
     async def ask_once(self, prompt: str, **need: Any) -> Reply:

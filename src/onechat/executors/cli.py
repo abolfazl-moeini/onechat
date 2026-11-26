@@ -23,7 +23,7 @@ from ..selector import is_high_effort_benchmark
 from .parsers import StreamParser
 from .process import ProcessRunner, ProcResult
 
-_PLACEHOLDER_RE = re.compile(r"\{(model|prompt|session_id)\}")
+_PLACEHOLDER_RE = re.compile(r"\{(model|prompt|session_id|workdir)\}")
 _QUOTA_RE = re.compile(
     r"\b(?:limit reach(?:ed)?|quota(?: exceeded)?|rate limit(?: exceeded)?|"
     r"http\s*429|status[:\s]*429|\b429\b)\b",
@@ -48,7 +48,13 @@ def build_argv(
     """Expand the new/resume template in ONE pass (values are never re-expanded).
     A flag-looking prompt in a positional slot gets a '--' separator (T07)."""
     template = profile.resume if req.native_session_id else profile.new
-    values = {"model": spec.model, "session_id": req.native_session_id or "", "prompt": req.prompt}
+    resolved_workdir = str(Path(req.workdir).expanduser().resolve())
+    values = {
+        "model": spec.model,
+        "session_id": req.native_session_id or "",
+        "prompt": req.prompt,
+        "workdir": resolved_workdir,
+    }
     via_stdin = profile.prompt_via == "stdin"
     flag_like = req.prompt.startswith("-")
     effort_args = _effort_flags(profile, req.prompt)
@@ -111,17 +117,27 @@ class CliExecutor:
     async def run(self, req: TurnRequest, on_event: OnEvent | None = None) -> TurnResult:
         start = time.monotonic()
         try:
+            workdir_path = Path(req.workdir).expanduser().resolve()
+            if not workdir_path.is_dir():
+                return TurnResult(
+                    stop=Stop.ERROR,
+                    error=f"Workdir does not exist or is not a directory: {workdir_path}",
+                    duration_s=_elapsed(start),
+                )
             stream = StreamParser(self.profile.parser)  # unknown parser: honest ERROR (T07)
             template_argv, stdin_prompt = build_argv(self.profile, self.spec, req)
             argv = [self.profile.binary, *template_argv]
             env = dict(os.environ)
             env.update(self.spec.env)
+            env["ONECHAT_WORKDIR"] = str(workdir_path)
+            if req.native_session_id:
+                env["ONECHAT_SESSION_ID"] = req.native_session_id
             kwargs = {}
             if getattr(self._runner, "supports_inactivity_timeout", False):
                 kwargs["inactivity_timeout_s"] = req.inactivity_timeout_s
             proc = await self._runner.run(
                 argv,
-                Path(req.workdir),
+                workdir_path,
                 env,
                 stdin_prompt,
                 req.timeout_s,

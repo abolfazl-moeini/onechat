@@ -1,8 +1,8 @@
 # zcode profile — drives desktop ZCode IDE via ai-driver CDP bridge (port 9224)
 name: zcode
 binary: ai-driver
-new:    ["run", "--driver", "zcode", "-m", "{model}", "--json", "-w", ".", "{prompt}"]
-resume: ["run", "--driver", "zcode", "-m", "{model}", "--session", "{session_id}", "--json", "-w", ".", "{prompt}"]
+new:    ["run", "--driver", "zcode", "-m", "{model}", "--json", "-w", "{workdir}", "{prompt}"]
+resume: ["run", "--driver", "zcode", "-m", "{model}", "--session", "{session_id}", "--json", "-w", "{workdir}", "{prompt}"]
 auto:   []
 prompt_via: argv
 parser: claude_stream_json

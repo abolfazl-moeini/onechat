@@ -1,8 +1,8 @@
 # workbuddy profile — drives desktop WorkBuddy AI via Electron CDP bridge with fullAccess/bypassPermissions
 name: workbuddy
 binary: workbuddy
-new:    ["-p", "{prompt}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
-resume: ["-p", "{prompt}", "--resume", "{session_id}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+new:    ["-p", "{prompt}", "--workdir", "{workdir}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--workdir", "{workdir}", "--resume", "{session_id}", "--output-format", "stream-json", "--verbose", "--model", "{model}", "{auto}"]
 auto:   ["--permission-mode", "bypassPermissions", "-y"]
 prompt_via: argv
 parser: claude_stream_json

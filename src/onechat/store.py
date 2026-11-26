@@ -99,6 +99,17 @@ class Store:
     def list_sessions(self) -> list[dict[str, Any]]:
         return self._query("SELECT * FROM sessions ORDER BY created_at DESC")
 
+    def latest_session_for_workdir(self, workdir: str | Path) -> dict[str, Any] | None:
+        """Find the most recent session created for a normalized workdir."""
+        target_path = str(Path(workdir).expanduser().resolve())
+        # First try exact match on normalized path
+        rows = self._query("SELECT * FROM sessions ORDER BY created_at DESC")
+        for row in rows:
+            row_wd = row.get("workdir")
+            if row_wd and str(Path(row_wd).expanduser().resolve()) == target_path:
+                return row
+        return None
+
     def pin(self, sid: str, executor_id: str | None, tier: int | None) -> None:
         self._exec(
             "UPDATE sessions SET pinned_executor=?, tier=? WHERE id=?", (executor_id, tier, sid)

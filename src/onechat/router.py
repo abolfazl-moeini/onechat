@@ -276,12 +276,25 @@ class Router:
         turns = self.store.turns(session_id, since_idx=0)  # full history (T12a off-by-one)
         await self._safe_compact(session, turns)
         self._emit(on_event, Event(kind="status", text=f"{spec.id}: done"))
+        native_row = self.store.get_native(session_id, spec.id)
+        native_sid = result.native_session_id
+        if not native_sid and native_row and native_row.get("native_id"):
+            native_sid = str(native_row["native_id"])
+        if resumed:
+            continuity_mode = "native_resume"
+        elif switched_from:
+            continuity_mode = "handoff"
+        else:
+            continuity_mode = "fresh"
         return Reply(
             text=result.text,
             executor_id=spec.id,
             stop=Stop.DONE,
             switched_from=switched_from,
             turn_idx=assistant_idx,
+            session_id=session_id,
+            native_session_id=native_sid,
+            continuity_mode=continuity_mode,
         )
 
     async def _safe_compact(self, session: dict[str, Any], turns: list[dict[str, Any]]) -> None:

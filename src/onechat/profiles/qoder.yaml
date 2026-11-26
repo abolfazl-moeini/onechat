@@ -1,8 +1,8 @@
 # qoder profile — drives desktop Qoder IDE via ai-driver CDP bridge (port 9223)
 name: qoder
 binary: ai-driver
-new:    ["run", "--driver", "qoder", "-m", "{model}", "--json", "-w", ".", "{prompt}"]
-resume: ["run", "--driver", "qoder", "-m", "{model}", "--session", "{session_id}", "--json", "-w", ".", "{prompt}"]
+new:    ["run", "--driver", "qoder", "-m", "{model}", "--json", "-w", "{workdir}", "{prompt}"]
+resume: ["run", "--driver", "qoder", "-m", "{model}", "--session", "{session_id}", "--json", "-w", "{workdir}", "{prompt}"]
 auto:   []
 prompt_via: argv
 parser: claude_stream_json

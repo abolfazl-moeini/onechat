@@ -130,6 +130,9 @@ class Reply(BaseModel):
     stop: Stop
     switched_from: list[str]
     turn_idx: int
+    session_id: str = ""
+    native_session_id: str | None = None
+    continuity_mode: Literal["fresh", "native_resume", "handoff"] = "fresh"
 
 
 class NoExecutorAvailable(Exception):

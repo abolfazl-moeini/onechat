@@ -1,8 +1,8 @@
 # autoclaw profile — drives desktop AutoClaw IDE via ai-driver CDP bridge (port 9226)
 name: autoclaw
 binary: ai-driver
-new:    ["run", "--driver", "autoclaw", "-m", "{model}", "--json", "-w", ".", "{prompt}"]
-resume: ["run", "--driver", "autoclaw", "-m", "{model}", "--session", "{session_id}", "--json", "-w", ".", "{prompt}"]
+new:    ["run", "--driver", "autoclaw", "-m", "{model}", "--json", "-w", "{workdir}", "{prompt}"]
+resume: ["run", "--driver", "autoclaw", "-m", "{model}", "--session", "{session_id}", "--json", "-w", "{workdir}", "{prompt}"]
 auto:   []
 prompt_via: argv
 parser: claude_stream_json

@@ -4,6 +4,7 @@ router.py stays within its 300-line budget. Sync or async git callables are both
 from __future__ import annotations
 
 import inspect
+import logging
 import re
 import time
 from collections.abc import Callable
@@ -15,6 +16,8 @@ from .contracts import Capability, TurnRequest
 from .handoff import api_messages, delta_brief, handoff_brief
 from .scoring import detect_skills
 from .selector import Need, order_candidates
+
+logger = logging.getLogger("onechat.router")
 
 TURN_TIMEOUT_S = 600
 _STALE_MARKERS = ("not found", "no such", "does not exist")
@@ -245,12 +248,27 @@ def advance_native(
     store: Any, session_id: str, spec: Any, result: Any, assistant_idx: int, resumed: bool
 ) -> None:
     if result.native_session_id:
+        if resumed:
+            prev = store.get_native(session_id, spec.id)
+            if prev and prev.get("native_id") and prev["native_id"] != result.native_session_id:
+                logger.warning(
+                    "Native session rotated on resume for %s: %s -> %s",
+                    spec.id,
+                    prev["native_id"],
+                    result.native_session_id,
+                )
         store.set_native(session_id, spec.id, result.native_session_id, assistant_idx)
         return
     if resumed:
         native = store.get_native(session_id, spec.id)
         if native is not None and native["native_id"]:
             store.set_native(session_id, spec.id, str(native["native_id"]), assistant_idx)
+    elif spec.kind == "cli":
+        logger.warning(
+            "Executor %s returned no native_session_id on fresh turn in session %s",
+            spec.id,
+            session_id,
+        )
 
 
 def select_candidates(

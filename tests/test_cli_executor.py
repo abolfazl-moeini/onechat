@@ -79,7 +79,7 @@ def test_builds_new_argv() -> None:
 def _req(**kw):
     from onechat.contracts import TurnRequest
 
-    base = dict(prompt="Reply with the word PONG", workdir=Path("/tmp/asf-spike"))
+    base = dict(prompt="Reply with the word PONG", workdir=Path("/tmp"))
     base.update(kw)
     return TurnRequest(**base)
 

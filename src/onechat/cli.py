@@ -64,6 +64,7 @@ def _run_progress_logger(quiet: bool) -> tuple[Callable[[Event], None], Callable
 def run(
     prompt: str,
     session: str | None = typer.Option(None, "--session", help="session id"),
+    new_session: bool = typer.Option(False, "--new-session", "--fresh", help="force new session"),
     tier: str = typer.Option("auto", "--tier"),
     executor: str | None = typer.Option(None, "--executor"),
     role: str | None = typer.Option(None, "--role"),
@@ -76,12 +77,20 @@ def run(
     no_fallback: bool = typer.Option(False, "--no-fallback", help="disable fallback"),
     quiet: bool = typer.Option(False, "--quiet", "-q", help="suppress stderr progress"),
 ) -> None:
-    """One turn in a (new or existing) session; prints reply or JSON."""
+    """One turn in a session (auto-continues latest for workdir); prints reply or JSON."""
     client = _client(config_path)
-    target = str(workdir.resolve()) if workdir is not None else str(Path.cwd())
+    target = str(workdir.resolve()) if workdir is not None else str(Path.cwd().resolve())
     on_event, stop_heartbeat = _run_progress_logger(quiet)
     try:
-        reply = client.session(workdir=target, session_id=session).ask_sync(
+        sess = client.session(
+            workdir=target,
+            session_id=session,
+            continue_latest=not new_session and session is None,
+        )
+        if not quiet and not json_output:
+            sys.stderr.write(f"[onechat] session: {sess.id} (workdir: {target})\n")
+            sys.stderr.flush()
+        reply = sess.ask_sync(
             prompt,
             tier=tier,
             executor=executor,
@@ -215,6 +224,7 @@ def benchmark(
 @app.command()
 def chat(
     session: str | None = typer.Option(None, "--session"),
+    new_session: bool = typer.Option(False, "--new-session", "--fresh", help="force new session"),
     tier: str = typer.Option("auto", "--tier"),
     executor: str | None = typer.Option(None, "--executor"),
     code: bool | None = typer.Option(None, "--code/--no-code"),
@@ -223,8 +233,14 @@ def chat(
 ) -> None:
     """REPL: one conversation over many backends. /exit to leave."""
     client = AsfClient(config_path=config_path)
-    capability = "code" if (code if code is not None else (workdir / ".git").exists()) else "chat"
-    sess = client.session(workdir=str(workdir), session_id=session)
+    resolved_wd = workdir.resolve()
+    has_git = (resolved_wd / ".git").exists()
+    capability = "code" if (code if code is not None else has_git) else "chat"
+    sess = client.session(
+        workdir=str(resolved_wd),
+        session_id=session,
+        continue_latest=not new_session and session is None,
+    )
     current_tier: str | Tier = tier
     current_executor: str | None = executor
     last_executor: str | None = None

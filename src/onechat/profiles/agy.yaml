@@ -2,8 +2,8 @@
 # help (docs/compat.md §1) so auto list is minimal: --sandbox only.
 name: agy
 binary: agy
-new:    ["-p", "{prompt}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
-resume: ["-p", "{prompt}", "--conversation", "{session_id}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
+new:    ["-p", "{prompt}", "--add-dir", "{workdir}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
+resume: ["-p", "{prompt}", "--conversation", "{session_id}", "--add-dir", "{workdir}", "--output-format", "stream-json", "--model", "{model}", "{auto}"]
 auto:   ["--dangerously-skip-permissions", "--mode", "accept-edits"]
 prompt_via: argv
 parser: agy_stream_json
