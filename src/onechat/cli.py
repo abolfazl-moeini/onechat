@@ -1,4 +1,4 @@
-"""asf-router CLI (Plan 03 §7): run, sessions, executors, doctor, chat. Mounted by asf_factory."""
+"""onechat CLI: run, sessions, executors, doctor, chat."""
 
 from __future__ import annotations
 
@@ -15,7 +15,9 @@ from .cli_repl import SLASH_COMMANDS, handle_slash, run_chat_turn
 from .contracts import Event, Tier
 from .sdk import AsfClient
 
-app = typer.Typer(help="onechat: one chat session surviving AI backend switches", no_args_is_help=True)
+app = typer.Typer(
+    help="onechat: one chat session surviving AI backend switches", no_args_is_help=True
+)
 executors_app = typer.Typer(help="executor pool management", no_args_is_help=True)
 sessions_app = typer.Typer(help="session inspection", no_args_is_help=True)
 app.add_typer(executors_app, name="executors")
@@ -39,13 +41,13 @@ def _run_progress_logger(quiet: bool) -> tuple[Callable[[Event], None], Callable
 
     def on_event(ev: Event) -> None:
         if ev.kind in ("status", "tool"):
-            sys.stderr.write(f"[asf] {ev.text}\n")
+            sys.stderr.write(f"[onechat] {ev.text}\n")
             sys.stderr.flush()
 
     def heartbeat() -> None:
         while not stop_ev.wait(15.0):
             elapsed = int(time.monotonic() - start)
-            sys.stderr.write(f"[asf] working... ({elapsed}s elapsed)\n")
+            sys.stderr.write(f"[onechat] working... ({elapsed}s elapsed)\n")
             sys.stderr.flush()
 
     th = threading.Thread(target=heartbeat, daemon=True)
@@ -226,7 +228,7 @@ def chat(
     current_tier: str | Tier = tier
     current_executor: str | None = executor
     last_executor: str | None = None
-    typer.echo("asf chat — /exit to leave, /help for commands")
+    typer.echo("onechat chat — /exit to leave, /help for commands")
     while True:
         try:
             prompt = input("you> ").strip()

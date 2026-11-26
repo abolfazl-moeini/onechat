@@ -16,7 +16,7 @@ import pytest
 
 from onechat.executors.parsers import PARSERS, parse
 
-FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "cli"
+FIXTURE_ROOT = Path(__file__).resolve().parent / "fixtures" / "cli"
 
 
 def fixture_profiles(case: str) -> list[Path]:
@@ -46,13 +46,7 @@ def _parser_for(profile: str) -> str:
     import yaml
 
     profile_path = (
-        Path(__file__).resolve().parent.parent
-        / "packages"
-        / "asf-router"
-        / "src"
-        / "onechat"
-        / "profiles"
-        / f"{profile}.yaml"
+        Path(__file__).resolve().parent.parent / "src" / "onechat" / "profiles" / f"{profile}.yaml"
     )
     return yaml.safe_load(profile_path.read_text(encoding="utf-8"))["parser"]
 

@@ -105,14 +105,14 @@ def test_cli_run_emits_progress_to_stderr_and_keeps_stdout_clean(
     result = RUNNER.invoke(cli_module.app, ["run", "hello", "--executor", "exec-a"])
     assert result.exit_code == 0, result.output
     assert "fake answer a" in result.stdout
-    assert "[asf]" in result.stderr
-    assert "[asf]" not in result.stdout
+    assert "[onechat]" in result.stderr
+    assert "[onechat]" not in result.stdout
 
 
 def test_cli_run_emits_tool_events_to_stderr(
     client: AsfClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """asf run forwards tool events to stderr without polluting stdout."""
+    """onechat run forwards tool events to stderr without polluting stdout."""
     from onechat.contracts import Event, Stop, TurnResult
 
     class ToolEmitting:
@@ -130,16 +130,16 @@ def test_cli_run_emits_tool_events_to_stderr(
     result = RUNNER.invoke(cli_module.app, ["run", "hello", "--executor", "exec-a"])
     assert result.exit_code == 0, result.output
     assert "done-tool" in result.stdout
-    assert "[asf] read_file foo.py" in result.stderr
-    assert "[asf]" not in result.stdout
+    assert "[onechat] read_file foo.py" in result.stderr
+    assert "[onechat]" not in result.stdout
 
 
 def test_cli_run_quiet_suppresses_stderr(client: AsfClient) -> None:
-    """asf run --quiet suppresses stderr progress logging."""
+    """onechat run --quiet suppresses stderr progress logging."""
     result = RUNNER.invoke(cli_module.app, ["run", "hello", "--executor", "exec-a", "--quiet"])
     assert result.exit_code == 0, result.output
     assert "fake answer a" in result.stdout
-    assert "[asf]" not in result.stderr
+    assert "[onechat]" not in result.stderr
 
 
 def test_chat_streams_text_events(client: AsfClient, monkeypatch) -> None:

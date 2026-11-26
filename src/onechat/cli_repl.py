@@ -1,4 +1,4 @@
-"""asf-router CLI REPL helpers (Plan 03 / T12b): extracted from cli.py to maintain LOC budget."""
+"""onechat CLI REPL helpers: extracted from cli.py to maintain LOC budget."""
 
 from __future__ import annotations
 

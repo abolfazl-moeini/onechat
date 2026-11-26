@@ -111,7 +111,7 @@ class AsyncProcessRunner:
                 if now >= wall_deadline:
                     raise TimeoutError("wall-clock timeout")
                 if inactivity_s and inactivity_s > 0 and (now - last_active[0]) >= inactivity_s:
-                    msg = b"\n[asf watchdog: process killed after inactivity timeout]\n"
+                    msg = b"\n[onechat watchdog: process killed after inactivity timeout]\n"
                     stderr_buf.extend(msg)
                     raise TimeoutError("inactivity timeout")
                 step = 0.5

@@ -1,4 +1,4 @@
-"""asf-router doctor implementation (T12b): extracted so cli.py stays lean."""
+"""onechat doctor implementation: extracted so cli.py stays lean."""
 
 from __future__ import annotations
 
