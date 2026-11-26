@@ -228,8 +228,8 @@ wheels = [
 ]
 
 [[package]]
-name = "onechat"
-version = "0.1.0"
+name = "onechat-cli"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "openai" },
