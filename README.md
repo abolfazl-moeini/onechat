@@ -47,6 +47,9 @@ flowchart LR
 
 ## Installation
 
+Package on PyPI: https://pypi.org/project/onechat-cli/  
+Source on GitHub: https://github.com/abolfazl-moeini/onechat
+
 ```bash
 # Install globally as a CLI tool (recommended)
 uv tool install onechat-cli
